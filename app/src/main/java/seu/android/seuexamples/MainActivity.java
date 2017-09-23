@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import seu.android.seuexamples.database.DatabaseHelper;
 import seu.android.seuexamples.model.Student;
 
 public class MainActivity extends AppCompatActivity {
@@ -33,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
         eTPhone = (EditText) findViewById(R.id.editTextPhone);
 
         listViewStd = (ListView) findViewById(R.id.listViewStudents);
-        studentObjList = new ArrayList<>();
+        DatabaseHelper dbHelper = new DatabaseHelper(MainActivity.this);
+        studentObjList = dbHelper.getAllStudentData();
         adapter = new ArrayAdapter<Student>(MainActivity.this, R.layout.listview_item_layout,
                 studentObjList);
         listViewStd.setAdapter(adapter);
@@ -52,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 dialog.show();
-
             }
         });
     }
@@ -103,7 +105,12 @@ public class MainActivity extends AppCompatActivity {
         if(error){
             Toast.makeText(MainActivity.this, "Data is not saved!", Toast.LENGTH_LONG).show();
         }else{
-            studentObjList.add(std);
+            //studentObjList.add(std);
+            DatabaseHelper db = new DatabaseHelper(MainActivity.this);
+            db.insertStudent(std);
+            studentObjList.clear();
+            studentObjList.addAll(db.getAllStudentData());
+            Log.i("Get", studentObjList.toString());
             adapter.notifyDataSetChanged();
             Toast.makeText(MainActivity.this, "Data is saved!", Toast.LENGTH_LONG).show();
             clearEditFields();
@@ -117,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
             clearEditFields();
             MainActivity.this.finish();
         }
-
     }
 
     private void clearEditFields() {
